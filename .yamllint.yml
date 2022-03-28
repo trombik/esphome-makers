@@ -5,6 +5,8 @@ rules:
   document-start:
     level: error
   truthy: disable
+  comments:
+    level: error
 
 ignore: |
   # yamllint does not understand erb template
