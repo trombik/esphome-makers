@@ -1,9 +1,14 @@
+# `esphome-makers`
+
+My `esphome` configuration files.
+
 ## Installing
 
 Clone the repository and install requirements:
 
 * python
-* tox
+* `tox`
+* `esphome` including necessary tool-chains, and packages
 
 ```console
 tox
@@ -20,6 +25,8 @@ tox -r
 ```console
 source .tox/python/bin/activate
 ```
+
+The file to source assumes variants of `bash` (`zsh` works).
 
 ## Running the server
 
