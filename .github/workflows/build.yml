@@ -44,5 +44,5 @@ jobs:
         run: |
           source .tox/python/bin/activate
           for F in `ls -1 config/*.yml`; do
-            esphome compile "${I}"
+            esphome compile "${F}"
           done
