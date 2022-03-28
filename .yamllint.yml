@@ -1,0 +1,11 @@
+---
+extends: default
+
+rules:
+  document-start:
+    level: error
+  truthy: disable
+
+ignore: |
+  # yamllint does not understand erb template
+  .tox
