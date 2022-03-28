@@ -1,4 +1,11 @@
 ---
+name: Run tox tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
 jobs:
   build:
     name: Build with ${{ matrix.python-version }}
