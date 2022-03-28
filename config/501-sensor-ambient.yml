@@ -60,16 +60,16 @@ sensor:
       id: humidity
     update_interval: 60s
 
-#font:
-#  - file: /usr/local/share/fonts/Droid/DroidSans.ttf
-#    id: font1
-#    size: 24
-#display:
-#  - platform: ssd1306_i2c
-#    model: "SSD1306 128x64"
-#    address: 0x3C
-#    lambda: |-
-#      it.printf(127, 0, id(font1), TextAlign::TOP_RIGHT,
-#        "%.2f°", id(temperature).state);
-#      it.printf(127, 24, id(font1), TextAlign::TOP_RIGHT,
-#        "%.1f%%", id(humidity).state);
+# font:
+#   - file: /usr/local/share/fonts/Droid/DroidSans.ttf
+#     id: font1
+#     size: 24
+# display:
+#   - platform: ssd1306_i2c
+#     model: "SSD1306 128x64"
+#     address: 0x3C
+#     lambda: |-
+#       it.printf(127, 0, id(font1), TextAlign::TOP_RIGHT,
+#         "%.2f°", id(temperature).state);
+#       it.printf(127, 24, id(font1), TextAlign::TOP_RIGHT,
+#         "%.1f%%", id(humidity).state);
