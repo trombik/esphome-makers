@@ -2,7 +2,8 @@
 
 [![Tests and build](https://github.com/trombik/esphome-makers/actions/workflows/build.yml/badge.svg)](https://github.com/trombik/esphome-makers/actions/workflows/build.yml)
 
-My `esphome` configuration files.
+My `esphome` configuration files at
+[Makers Siem Reap](http://info.mkrsgh.org/makerspace/).
 
 ## Installing
 
