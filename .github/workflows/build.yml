@@ -1,5 +1,5 @@
 ---
-name: Run tox tests
+name: Tests and build
 on:
   push:
     branches:
