@@ -40,6 +40,10 @@ jobs:
       - name: Test with tox
         run: tox
 
+      - name: Copy dummy secrets.yaml for CI
+        run: |
+          cp config/.secrets.yaml config/secrets.yaml
+
       - name: Build all YAML configuration files
         run: |
           source .tox/python/bin/activate
