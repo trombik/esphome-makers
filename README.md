@@ -1,5 +1,7 @@
 # `esphome-makers`
 
+[![Tests and build](https://github.com/trombik/esphome-makers/actions/workflows/build.yml/badge.svg)](https://github.com/trombik/esphome-makers/actions/workflows/build.yml)
+
 My `esphome` configuration files.
 
 ## Installing
