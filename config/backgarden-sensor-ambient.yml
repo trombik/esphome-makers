@@ -1,0 +1,102 @@
+---
+
+substitutions:
+  myname: backgarden-sensor-ambient
+  location: "backgarden"
+  influxdb_host: !secret influxdb_host
+  influxdb_port: !secret influxdb_port
+  influxdb_database: !secret influxdb_database
+  influxdb_user: !secret influxdb_user
+  influxdb_password: !secret influxdb_password
+  influxdb_scheme: !secret influxdb_scheme
+
+esphome:
+  name: ${myname}
+
+esp8266:
+  board: nodemcuv2
+
+logger:
+  level: debug
+
+api:
+  password: !secret api_password
+
+debug:
+  update_interval: 5s
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+globals:
+  - id: buf
+    type: char[512]
+    restore_value: no
+    initial_value: ""
+
+http_request:
+  useragent: esphome/${myname}
+  timeout: 10s
+
+i2c:
+  sda: GPIO0
+  scl: GPIO2
+  scan: true
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: ESP IP Address ${myname}
+    ssid:
+      name: ESP Connected SSID ${myname}
+    bssid:
+      name: ESP Connected BSSID ${myname}
+    mac_address:
+      name: ESP Mac Wifi Address ${myname}
+    scan_results:
+      name: ESP Latest Scan Results ${myname}
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor ${myname}"
+    update_interval: 60s
+
+  - platform: uptime
+    name: Uptime Sensor ${myname}
+
+  - platform: bme280
+    temperature:
+      name: "Temperature ${location}"
+      id: temperature
+      on_value:
+        then:
+          - http_request.post:
+              url: "${influxdb_scheme}://${influxdb_host}:${influxdb_port}/write?db=${influxdb_database}&u=${influxdb_user}&p=${influxdb_password}"
+              body: !lambda |-
+                snprintf(id(buf), sizeof(id(buf)), "ambient,location=${location},host=${myname} temperature=%0.1f", id(temperature).state);
+                return id(buf);
+    humidity:
+      name: "Humidity ${location}"
+      id: humidity
+      on_value:
+        then:
+          - http_request.post:
+              url: "${influxdb_scheme}://${influxdb_host}:${influxdb_port}/write?db=${influxdb_database}&u=${influxdb_user}&p=${influxdb_password}"
+              body: !lambda |-
+                snprintf(id(buf), sizeof(id(buf)), "ambient,location=${location},host=${myname} humidity=%0.1f", id(humidity).state);
+                return id(buf);
+    pressure:
+      name: "Pressure ${location}"
+      id: pressure
+      on_value:
+        then:
+          - http_request.post:
+              url: "${influxdb_scheme}://${influxdb_host}:${influxdb_port}/write?db=${influxdb_database}&u=${influxdb_user}&p=${influxdb_password}"
+              body: !lambda |-
+                snprintf(id(buf), sizeof(id(buf)), "ambient,location=${location},host=${myname} pressure=%d", (int)id(pressure).state);
+                return id(buf);
+    update_interval: 60s
