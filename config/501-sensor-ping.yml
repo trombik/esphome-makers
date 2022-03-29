@@ -5,7 +5,7 @@ substitutions:
   location: "501"
   influxdb_host: !secret influxdb_host
   influxdb_port: !secret influxdb_port
-  influxdb_database: !secret influxdb_database
+  influxdb_database: network
   influxdb_user: !secret influxdb_user
   influxdb_password: !secret influxdb_password
   influxdb_scheme: !secret influxdb_scheme
@@ -69,6 +69,14 @@ sensor:
   - platform: wifi_signal
     name: "WiFi Signal Sensor ${myname}"
     update_interval: 60s
+    id: signal
+    on_value:
+      then:
+        - http_request.post:
+            url: "${influxdb_scheme}://${influxdb_host}:${influxdb_port}/write?db=${influxdb_database}&u=${influxdb_user}&p=${influxdb_password}"
+            body: !lambda |-
+              snprintf(id(buf), sizeof(id(buf)), "wifi,location=${location},host=${myname} wifi_signal=%d", (int)id(signal).state);
+              return id(buf);
 
   - platform: uptime
     name: Uptime Sensor ${myname}
