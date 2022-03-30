@@ -2,8 +2,6 @@
 name: Tests and build
 on:
   push:
-    branches:
-      - main
   pull_request:
   schedule:
     # run at 2:15pm on the first of every month
