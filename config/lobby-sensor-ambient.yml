@@ -104,6 +104,8 @@ sensor:
 
   - platform: ccs811
     address: 0x5A
+    temperature: temperature
+    humidity: humidity
     eco2:
       name: "eCO2 ${location}"
       id: eco2
