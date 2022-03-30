@@ -103,9 +103,18 @@ sensor:
     update_interval: 60s
 
   - platform: ccs811
+    address: 0x5A
     eco2:
       name: "eCO2 ${location}"
+      id: eco2
+      on_value:
+        then:
+          - http_request.post:
+              url: "${influxdb_scheme}://${influxdb_host}:${influxdb_port}/write?db=${influxdb_database}&u=${influxdb_user}&p=${influxdb_password}"
+              body: !lambda |-
+                snprintf(id(buf), sizeof(id(buf)), "ambient,location=${location},host=${myname} eco2=%d", (int)id(eco2).state);
+                return id(buf);
+
     tvoc:
       name: "TVOC ${location}"
-    address: 0x5A
     update_interval: 60s
