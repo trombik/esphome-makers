@@ -21,6 +21,7 @@ logger:
 
 api:
   password: !secret api_password
+
 debug:
   update_interval: 5s
 
@@ -36,7 +37,6 @@ globals:
     type: char[512]
     restore_value: no
     initial_value: ""
-
 
 http_request:
   useragent: esphome/${myname}
