@@ -14,7 +14,7 @@ esphome:
   name: ${myname}
 
 esp8266:
-  board: nodemcuv2
+  board: esp01_1m
 
 logger:
   level: debug
@@ -69,6 +69,7 @@ sensor:
     name: Uptime Sensor ${myname}
 
   - platform: bme280
+    address: 0x76
     temperature:
       name: "Temperature ${location}"
       id: temperature
@@ -99,4 +100,12 @@ sensor:
               body: !lambda |-
                 snprintf(id(buf), sizeof(id(buf)), "ambient,location=${location},host=${myname} pressure=%d", (int)id(pressure).state);
                 return id(buf);
+    update_interval: 60s
+
+  - platform: ccs811
+    eco2:
+      name: "eCO2 ${location}"
+    tvoc:
+      name: "TVOC ${location}"
+    address: 0x5A
     update_interval: 60s
