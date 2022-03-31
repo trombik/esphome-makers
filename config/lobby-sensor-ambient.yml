@@ -60,6 +60,10 @@ text_sensor:
     scan_results:
       name: ESP Latest Scan Results ${myname}
 
+switch:
+  - platform: restart
+    name: "Restart ${myname}"
+
 sensor:
   - platform: wifi_signal
     name: "WiFi Signal Sensor ${myname}"
@@ -98,7 +102,7 @@ sensor:
           - http_request.post:
               url: "${influxdb_scheme}://${influxdb_host}:${influxdb_port}/write?db=${influxdb_database}&u=${influxdb_user}&p=${influxdb_password}"
               body: !lambda |-
-                snprintf(id(buf), sizeof(id(buf)), "ambient,location=${location},host=${myname} pressure=%d", (int)id(pressure).state);
+                snprintf(id(buf), sizeof(id(buf)), "ambient,location=${location},host=${myname} pressure=%0.1f", id(pressure).state);
                 return id(buf);
     update_interval: 60s
 
