@@ -46,7 +46,7 @@ external_components:
   - source:
       type: git
       url: https://github.com/trombik/esphome-component-ping
-      ref: issue_23
+      ref: main
 
 http_request:
   useragent: esphome/${myname}
