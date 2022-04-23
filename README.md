@@ -59,3 +59,8 @@ Over the Air:
 ```console
 esphome run config/foo.yml
 ```
+
+## Resources
+
+* [Generic Sonoff](https://esphome.io/devices/sonoff.html) pinouts of `Sonoff`
+  devices.
