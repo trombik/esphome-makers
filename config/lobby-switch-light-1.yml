@@ -56,3 +56,26 @@ sensor:
 
   - platform: uptime
     name: Uptime Sensor ${myname}
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode:
+        input: true
+        pullup: true
+      inverted: true
+    name: "Button ${myname}"
+    on_press:
+      - switch.toggle: relay
+
+switch:
+  - platform: gpio
+    name: "Relay ${myname}"
+    pin: GPIO12
+    id: relay
+
+status_led:
+  pin:
+    number: GPIO13
+    inverted: yes
