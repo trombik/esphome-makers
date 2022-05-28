@@ -73,9 +73,20 @@ switch:
   - platform: gpio
     name: "Relay ${myname}"
     pin: GPIO12
+    # XXX do not keep state in EEPROM.
+    # * the state does not change often
+    # * when it is always on, you may turn on or off the device with an
+    # external switch if present.
+    restore_mode: ALWAYS_ON
     id: relay
 
 status_led:
   pin:
     number: GPIO13
     inverted: yes
+
+button:
+  - platform: restart
+    name: "Restart ${myname}"
+
+web_server:
