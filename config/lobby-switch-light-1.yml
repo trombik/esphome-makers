@@ -88,5 +88,3 @@ status_led:
 button:
   - platform: restart
     name: "Restart ${myname}"
-
-web_server:
