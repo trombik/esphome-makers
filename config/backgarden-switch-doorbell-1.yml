@@ -20,9 +20,9 @@
 # connect the button pins to GND and GPIO16 so that GPIO16 goes to LOW when
 # the button is pressed.
 #
-# when GPIO16 (or RST as they are connected) goes to LOW, the doorbell wakes
-# up. when it wakes up, it posts a message to a slack channel. it goes to
-# sleep forever.
+# when GPIO16 (or RST as they are connected) goes to LOW and then to HIGH
+# (rising edge), the doorbell wakes up. when it wakes up, it posts a message
+# to a slack channel.  it goes to sleep forever.
 #
 # it takes a few seconds for the message to arrive because, before posting a
 # message, it needs to:
