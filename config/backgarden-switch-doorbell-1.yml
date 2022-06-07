@@ -24,6 +24,9 @@
 # (rising edge), the doorbell wakes up. when it wakes up, it posts a message
 # to a slack channel.  it goes to sleep forever.
 #
+# connect D6, or GPIO12, to a LED through a 1K ohm resistor. this LED blinks
+# when HTTP response is returned. reduce the resistor value if it's too dark.
+#
 # it takes a few seconds for the message to arrive because, before posting a
 # message, it needs to:
 #
