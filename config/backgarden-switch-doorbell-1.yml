@@ -68,6 +68,29 @@ esphome:
               return id(buf);
             # enable group mention, makes `@here` work
             link_names: "true"
+          # give feedback to users. was it successful?
+          on_response:
+            then:
+              - if:
+                  condition:
+                    lambda: "return status_code == 200;"
+                  # when success, blink the LED twice
+                  then:
+                    - output.turn_on: led
+                    - delay: 0.3s
+                    - output.turn_off: led
+                    - delay: 0.3s
+                    - output.turn_on: led
+                    - delay: 0.3s
+                    - output.turn_off: led
+                  # when error happens, blink the LED once, and longer
+                  else:
+                    - output.turn_on: led
+                    - delay: 3s
+                    - output.turn_off: led
+              # then, regardless of status code, deep sleep.
+              - deep_sleep.enter:
+                  id: deep_sleep_1
 
 esp8266:
   board: nodemcuv2
@@ -129,8 +152,15 @@ sensor:
   - platform: uptime
     name: Uptime Sensor ${myname}
 
+# the pin to give feedback with an LED.
+output:
+  - platform: gpio
+    pin: D6
+    id: led
+    inverted: false
+
 deep_sleep:
-  run_duration: 10s
+  id: deep_sleep_1
   # sleep indefinitely. the max value of sleep_duration on ESP8266 is about 3
   # hours 46 minutes. a value bigger than this makes ESP8266 in deep sleep
   # indefinitely.
