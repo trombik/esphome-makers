@@ -37,6 +37,12 @@
 #
 # other idea: replace the button with other sensors, such as PIR motion
 # sensor. make sure the input signal goes to LOW when you want to be notified.
+#
+# known issues:
+#
+# it is slow to post messages. to reduce the time, you need a power source,
+# and disable deep sleep. or, use fixed IP address, which reduces DHCP
+# requests and responses. disabling WiFi AP scanning is also an idea.
 
 # common strings used throughout the program. something unique to the device.
 substitutions:
