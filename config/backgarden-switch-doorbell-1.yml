@@ -1,5 +1,44 @@
 ---
 
+# a doorbell to notify users via slack. when someone pushes a button, the
+# device posts a message to a slack channel.
+#
+# the configuration uses deepsleep to run the device with a battery so that it
+# can be used somewhere where power source is not available.
+#
+# you need:
+#
+# * a ESP8266 module or a ESP8266 development board, such as NodeMCU
+# * a button (normally open)
+# * a channel and webhook URL
+#
+# to create a webhook URL, see:
+# https://api.slack.com/messaging/webhooks
+#
+# connect GPIO16 to RST. this is necessary to use deepsleep.
+#
+# connect the button pins to GND and GPIO16 so that GPIO16 goes to LOW when
+# the button is pressed.
+#
+# when GPIO16 (or RST as they are connected) goes to LOW, the doorbell wakes
+# up. when it wakes up, it posts a message to a slack channel. it goes to
+# sleep forever.
+#
+# it takes a few seconds for the message to arrive because, before posting a
+# message, it needs to:
+#
+# * boot
+# * configure the WiFi interface
+# * connect to the network, and obtain an IP address from DHCP server
+#
+# a common ESP8266 boards can be used. however, most of develepment boards are
+# not power-efficient. for longer battery life, build one using a bare ESP8266
+# module, such as ESP-12F.
+#
+# other idea: replace the button with other sensors, such as PIR motion
+# sensor. make sure the input signal goes to LOW when you want to be notified.
+
+# common strings used throughout the program. something unique to the device.
 substitutions:
   myname: backgarden-doorbell-1
   location: "backgarden"
@@ -9,15 +48,21 @@ esphome:
   on_boot:
     # post a message to slack upon boot. with priority higher than 200, the
     # network is available.
+    # see:
+    # https://esphome.io/components/esphome.html#on-boot
+    # https://esphome.io/components/http_request.html
     priority: 200
     then:
       - http_request.post:
+          # the URL of slack web hook.
           url: !secret slack_webhook_url_esphome_doorbell
-          # TLS verification does not work on ESP8266
+          # disable TLS verification because it does not work on ESP8266.
           verify_ssl: false
           headers:
             Content-Type: application/json
           json:
+            # see how to format at:
+            # https://api.slack.com/reference/surfaces/formatting
             text: !lambda |-
               snprintf(id(buf), sizeof(id(buf)), "@here Someone pushed me at %s", "${location}");
               return id(buf);
@@ -36,19 +81,28 @@ api:
 debug:
   update_interval: 5s
 
+# OTA is enabled here but it does not work because the device is almost always
+# in deepsleep.
 ota:
   password: !secret ota_password
 
+# the WiFi SSID and password for your network.
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
 
 globals:
+  # a buffer to hold the message string because snprintf(3) is used to create
+  # the message.
+  #
+  # you may remove this and snprintf(3) above if the message is a static,
+  # fixed message.
   - id: buf
     type: char[512]
     restore_value: no
     initial_value: ""
 
+# to post HTTP requests, you need http_request component.
 http_request:
   useragent: esphome/${myname}
   timeout: 10s
@@ -66,6 +120,7 @@ text_sensor:
     scan_results:
       name: ESP Latest Scan Results ${myname}
 
+# it is always a good idea to have these sensors for debugging.
 sensor:
   - platform: wifi_signal
     name: "WiFi Signal Sensor ${myname}"
