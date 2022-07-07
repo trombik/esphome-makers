@@ -1,0 +1,147 @@
+---
+
+substitutions:
+  myname: frontgarden-switch-irrigation-1
+  location: frontgarden
+
+esphome:
+  name: ${myname}
+  on_boot:
+    then:
+      - lambda: |-
+          id(gpio4).publish_initial_state(false);
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+logger:
+  level: debug
+
+api:
+  password: !secret api_password
+
+debug:
+  update_interval: 5s
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+web_server:
+
+binary_sensor:
+  - platform: gpio
+    name: gpio4
+    id: gpio4
+    pin:
+      number: GPIO4
+      inverted: true
+      mode:
+        input: true
+        pullup: true
+
+    on_click:
+      then:
+        - logger.log: "Button pressed"
+        - script.execute: do_watering
+
+button:
+  - platform: template
+    name: "Valve Button"
+    on_press:
+      then:
+        - logger.log: Button Pressed (via web_server)
+        - script.execute: do_watering
+switch:
+  - platform: restart
+    name: "Restart ${myname}"
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor ${myname}"
+    update_interval: 60s
+
+  - platform: uptime
+    name: Uptime Sensor ${myname}
+
+  - platform: adc
+    id: soil_sesnor
+    pin: GPIO36
+    name: "Soil sensor voltage"
+    update_interval: 3s
+    attenuation: auto
+    on_value:
+      then:
+        - lambda: |-
+            const float max = 2.4; // max raw voltage
+            const float min = 1.0; // min raw voltage
+            float humidiy = 1 - ((x - min) / (max - min));
+            id(soil_humidy).publish_state(humidiy * 100);
+
+  - platform: template
+    id: soil_humidy
+    name: "Soil humidiy"
+    unit_of_measurement: H%
+    icon: "mdi:water-percent"
+    device_class: humidity
+    state_class: measurement
+    accuracy_decimals: 1
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: ESP IP Address ${myname}
+    ssid:
+      name: ESP Connected SSID ${myname}
+    bssid:
+      name: ESP Connected BSSID ${myname}
+    mac_address:
+      name: ESP Mac Wifi Address ${myname}
+    scan_results:
+      name: ESP Latest Scan Results ${myname}
+
+status_led:
+  pin: GPIO2
+
+output:
+  - platform: ledc
+    pin: GPIO22
+    id: valve_solenoid
+    frequency: 1000Hz
+
+script:
+  - id: timer_10_min
+    then:
+      - logger.log: Timer starts (10 min)
+      - delay: 10min
+
+  - id: open_valve
+    then:
+      - logger.log: Open the valve
+      - output.turn_on: valve_solenoid
+      - output.set_level:
+          id: valve_solenoid
+          level: 90%
+      - delay: 1s
+      - logger.log: Lower current enough to hold the valve open
+      - output.set_level:
+          id: valve_solenoid
+          level: 50%
+
+  - id: close_valve
+    then:
+      - logger.log: Close the valve
+      - output.turn_off: valve_solenoid
+
+  - id: do_watering
+    mode: single
+    then:
+      - script.execute: open_valve
+      - logger.log: Keep the valve open
+      - delay: 3s
+      - script.execute: close_valve
