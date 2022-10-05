@@ -1,0 +1,109 @@
+---
+substitutions:
+  myname: lobby-switch-led-strip
+  location: "lobby"
+
+esphome:
+  name: ${myname}
+
+esp8266:
+  board: d1_mini
+
+logger:
+  level: debug
+
+api:
+  password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
+
+debug:
+  update_interval: 5s
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+globals:
+  - id: buf
+    type: char[512]
+    restore_value: no
+    initial_value: ""
+
+http_request:
+  useragent: esphome/${myname}
+  timeout: 10s
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: ESP IP Address ${myname}
+    ssid:
+      name: ESP Connected SSID ${myname}
+    bssid:
+      name: ESP Connected BSSID ${myname}
+    mac_address:
+      name: ESP Mac Wifi Address ${myname}
+    scan_results:
+      name: ESP Latest Scan Results ${myname}
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor ${myname}"
+    update_interval: 60s
+
+  - platform: uptime
+    name: Uptime Sensor ${myname}
+
+time:
+  - platform: sntp
+    id: sntp_time
+
+output:
+  - platform: esp8266_pwm
+    pin: GPIO14
+    frequency: 1000 Hz
+    id: pwm_output_1
+    min_power: 0.01
+    max_power: 0.8
+    zero_means_zero: True
+  - platform: esp8266_pwm
+    pin: GPIO12
+    frequency: 1000 Hz
+    id: pwm_output_2
+    min_power: 0.01
+    max_power: 0.8
+    zero_means_zero: True
+  - platform: esp8266_pwm
+    pin: GPIO13
+    frequency: 1000 Hz
+    id: pwm_output_3
+    min_power: 0.01
+    max_power: 0.8
+    zero_means_zero: True
+
+light:
+  - platform: monochromatic
+    name: "Upper light"
+    output: pwm_output_1
+  - platform: monochromatic
+    name: "Unused"
+    output: pwm_output_2
+  - platform: monochromatic
+    name: "Desk light"
+    output: pwm_output_3
+
+status_led:
+  pin:
+    number: GPIO2
+    inverted: yes
+
+web_server:
+  port: 80
+
+button:
+  - platform: restart
+    name: "Restart ${myname}"
