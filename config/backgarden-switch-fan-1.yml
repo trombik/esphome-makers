@@ -15,6 +15,8 @@ logger:
 
 api:
   password: !secret api_password
+  encryption:
+    key: !secret api_encryption_key
 
 debug:
   update_interval: 5s
