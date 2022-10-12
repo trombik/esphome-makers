@@ -95,3 +95,7 @@ status_led:
   pin:
     number: D4
     inverted: yes
+
+button:
+  - platform: restart
+    name: "Restart ${myname}"
