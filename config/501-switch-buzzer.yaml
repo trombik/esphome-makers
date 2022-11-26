@@ -1,0 +1,56 @@
+---
+
+substitutions:
+  myname: 501-switch-buzzer
+  location: "501"
+
+esphome:
+  name: ${myname}
+
+esp8266:
+  board: nodemcuv2
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: ${myname}
+    password: !secret wifi_ap_password
+
+captive_portal:
+
+switch:
+  - platform: gpio
+    pin: D2
+    name: Buzzer
+    id: buzzer
+
+button:
+  - platform: template
+    name: "Buzzer button"
+    on_press:
+      - switch.turn_on: buzzer
+      - repeat:
+          count: 2
+          then:
+            - switch.turn_on: buzzer
+            - delay: 500ms
+            - switch.turn_off: buzzer
+            - delay: 100ms
+            - switch.turn_on: buzzer
+            - delay: 500ms
+            - switch.turn_off: buzzer
+            - delay: 1s
